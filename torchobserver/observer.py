@@ -24,6 +24,9 @@ class Observer(BaseObserver):
         self._outputs.clear()
 
     def _save(self, output, name):
+        if 'kwargs' not in output:
+            output['kwargs'] = {}
+
         if output['type'] == 'Mel':
             if self._vocoder is not None:
                 output['data'] = self._vocoder(output['data'])
@@ -36,9 +39,6 @@ class Observer(BaseObserver):
 
         if isinstance(output['data'], torch.Tensor):
             output['data'] = output['data'].detach().cpu().numpy()
-
-        if 'kwargs' not in output:
-            output['kwargs'] = {}
 
         wandb.log(
             {f"{output['type']}/{output['name']}/{name}": getattr(wandb, output['type'])(output['data'], **output['kwargs'])}
