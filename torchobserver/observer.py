@@ -52,6 +52,8 @@ class Observer(BaseObserver):
                     self._save(out, name)
             else:
                 self._save(output, name)
+
+        self._reset()
                             
 
     @contextlib.contextmanager
