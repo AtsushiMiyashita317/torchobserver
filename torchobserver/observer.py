@@ -185,7 +185,7 @@ class GradObserver(BaseObserver):
 
             zero = x['zero']
             var = torch.diag(zero)
-            zero = zero.add(1e-6) / torch.sqrt(var.unsqueeze(0)*var.unsqueeze(1)).add(1e-6)
+            zero = zero / torch.sqrt(var.unsqueeze(0)*var.unsqueeze(1))
             zero = zero.detach().cpu()
 
             ax[0].imshow(zero, vmin=-1, vmax=1)
@@ -199,7 +199,7 @@ class GradObserver(BaseObserver):
 
             mean = x['mean']
             var = torch.diag(mean)
-            mean = mean.add(1e-6) / torch.sqrt(var.unsqueeze(0)*var.unsqueeze(1)).add(1e-6)
+            mean = mean / torch.sqrt(var.unsqueeze(0)*var.unsqueeze(1))
             mean = mean.detach().cpu()
 
             ax[1].imshow(mean, vmin=-1, vmax=1)
