@@ -72,11 +72,12 @@ class Model(torch.nn.Module):
         """
         # === Procedure to get audio or acoustic feature === #
 
-        return {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}}
+        return {'type': 'Audio', 'name': '<audio name>', 'data': <audio>, 'kwargs': {}}
         # You can observe multiple audio
+        # You can use vocoder for acoustic feature
         # return [
-        #     {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}},
-        #     {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}},
+        #     {'type': 'Audio', 'name': '<audio name>', 'data': <audio>, 'kwargs': {}},
+        #     {'type': 'Mel', 'name': '<audio name>', 'data': <acoustic feature>, 'kwargs': {}},
         # ]
 
     
