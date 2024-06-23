@@ -209,8 +209,9 @@ class GradObserver(BaseObserver):
                     torch.nn.ConvTranspose3d,
                 )
             ):
-                handle = modu.weight.register_hook(self._save_grad(name))
-                handles[name] = handle
+                if modu.weight.requires_grad:
+                    handle = modu.weight.register_hook(self._save_grad(name))
+                    handles[name] = handle
         try:
             yield model
         finally:
