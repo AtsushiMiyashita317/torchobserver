@@ -73,7 +73,7 @@ class Model(torch.nn.Module):
         # === Procedure to get audio or acoustic feature === #
 
         return {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}}
-        # You can observe multiple images
+        # You can observe multiple audio
         # return [
         #     {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}},
         #     {'type': 'Image', 'name': '<image name>', 'data': <audio or acoustic feature>, 'kwargs': {}},
