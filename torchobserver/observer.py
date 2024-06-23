@@ -73,6 +73,7 @@ class Observer(BaseObserver):
 
 class GradObserver(BaseObserver):
     def __init__(self) -> None:
+        self._weight_norms = OrderedDict()
         self._grad_norms = OrderedDict()
         self._grad_vectors = OrderedDict()
         self._metric_tensors = defaultdict(lambda: defaultdict(lambda: torch.tensor(0.0)))
@@ -145,17 +146,39 @@ class GradObserver(BaseObserver):
         self._n += 1
 
     def save(self):
+        weight_norm = torch.tensor([self._weight_norms[name] for name in self._norm_tensors.keys()])
+        grad_norm = torch.tensor(list(self._norm_tensors.values()))
+        relative_norm = grad_norm / weight_norm
+
         fig, ax = plt.subplots(1, 1)
-        norm_tensors = torch.tensor(list(self._norm_tensors.values()))
-        ax.plot(torch.log2(norm_tensors / self._n))
+        ax.plot(torch.log2(weight_norm))
+        ax.set_title("Weight Norm")
+        ax.set_xlabel("Layer")
+        ax.set_ylabel("Log2 Norm")
+        ax.set_xticks(range(len(self._norm_tensors)))
+        ax.set_xticklabels(list(self._norm_tensors.keys()), rotation=90)
+        fig.tight_layout()
+        wandb.log({f"Grad/WeightNorm": wandb.Image(fig)})
+
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(torch.log2(grad_norm / self._n))
         ax.set_title("Grad Norm")
         ax.set_xlabel("Layer")
         ax.set_ylabel("Log2 Norm")
         ax.set_xticks(range(len(self._norm_tensors)))
         ax.set_xticklabels(list(self._norm_tensors.keys()), rotation=90)
         fig.tight_layout()
-        wandb.log({f"Grad/LogNorm": wandb.Image(fig)})
+        wandb.log({f"Grad/GradNorm": wandb.Image(fig)})
 
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(torch.log2(relative_norm))
+        ax.set_title("Relative Norm")
+        ax.set_xlabel("Layer")
+        ax.set_ylabel("Log2 Norm")
+        ax.set_xticks(range(len(self._norm_tensors)))
+        ax.set_xticklabels(list(self._norm_tensors.keys()), rotation=90)
+        fig.tight_layout()
+        wandb.log({f"Grad/RelativeNorm": wandb.Image(fig)})
 
         for name, x in self._metric_tensors.items():
             fig, ax = plt.subplots(2, 1)
@@ -212,6 +235,8 @@ class GradObserver(BaseObserver):
                 if modu.weight.requires_grad:
                     handle = modu.weight.register_hook(self._save_grad(name))
                     handles[name] = handle
+
+                    self._weight_norms[name] = modu.weight.detach().square().mean().sqrt()
         try:
             yield model
         finally:
