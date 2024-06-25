@@ -54,6 +54,7 @@ class Observer(BaseObserver):
                 self._save(output, name)
 
         self._reset()
+        plt.close('all')
                             
 
     @contextlib.contextmanager
